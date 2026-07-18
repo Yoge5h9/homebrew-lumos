@@ -11,8 +11,8 @@
 class Lumos < Formula
   desc "Calm, ambient menu-bar glow for your Claude Code 5-hour usage window"
   homepage "https://github.com/Yoge5h9/Lumos"
-  url "https://github.com/Yoge5h9/Lumos/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "87200eee39365255c4808ab50f32ac29dff74fa1bbf31c693c9bd3dd293f3c66"
+  url "https://github.com/Yoge5h9/Lumos/archive/refs/tags/v0.1.1.tar.gz"
+  sha256 "8bbb6a1ab8c012e79015755caddcc9485783dfbad2dd59a9afb000b00c82a5ae"
   license "MIT"
 
   # `brew install --HEAD` builds straight off the default branch.
