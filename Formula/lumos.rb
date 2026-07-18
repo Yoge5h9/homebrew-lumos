@@ -23,6 +23,16 @@ class Lumos < Formula
   # `brew install --HEAD` builds straight off the default branch from source.
   head "https://github.com/Yoge5h9/Lumos.git", branch: "main"
 
+  # A single `:all` bottle carries the prebuilt universal Lumos.app. It's what
+  # actually removes the compile/CLT wall: Homebrew runs its "Command Line Tools
+  # too outdated" gate only on the build-from-source path — pouring a bottle
+  # skips it. skip_relocation is valid because the binary is standalone (nothing
+  # Cellar-relative to rewrite), so the pour needs no developer tools at all.
+  bottle do
+    root_url "https://github.com/Yoge5h9/Lumos/releases/download/v0.1.2"
+    sha256 cellar: :any_skip_relocation, all: "3b155712dc9db51502c9315f3df2a718786220e6c2c49e9e313268283771cd86"
+  end
+
   depends_on macos: :ventura # LSMinimumSystemVersion == 13.0 (Ventura)
 
   def install
