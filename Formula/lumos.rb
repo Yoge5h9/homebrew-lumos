@@ -1,49 +1,47 @@
 # Homebrew formula for Lumos — a calm, ambient macOS menu-bar app that shows
 # Claude Code's 5-hour usage window as a notch glow + menu-bar LED.
 #
-# BUILD-FROM-SOURCE (not a cask): Homebrew compiles Lumos locally via Swift
-# Package Manager. Because the binary is never downloaded prebuilt, macOS
-# Gatekeeper never flags it — no "unidentified developer" prompt, no Apple
-# Developer account, no notarization. See DISTRIBUTION.md in the main repo.
+# PREBUILT BINARY (not a cask): the stable install downloads a prebuilt,
+# ad-hoc-signed universal Lumos.app from the GitHub Release — no compiler, no
+# Command Line Tools, no Xcode. It stays Gatekeeper-free without an Apple
+# Developer account because a Homebrew *formula* installs files WITHOUT the
+# com.apple.quarantine xattr, and an ad-hoc signature is enough to run. (A cask
+# would be quarantined and need notarization — this is a formula, not a cask.)
+#
+# `brew install --HEAD` still compiles from source for anyone who prefers it.
 #
 # Lives in the separate `homebrew-lumos` tap repo (`Yoge5h9/homebrew-lumos`).
 
 class Lumos < Formula
   desc "Calm, ambient menu-bar glow for your Claude Code 5-hour usage window"
   homepage "https://github.com/Yoge5h9/Lumos"
-  url "https://github.com/Yoge5h9/Lumos/archive/refs/tags/v0.1.1.tar.gz"
-  sha256 "8bbb6a1ab8c012e79015755caddcc9485783dfbad2dd59a9afb000b00c82a5ae"
+  version "0.1.2"
+  url "https://github.com/Yoge5h9/Lumos/releases/download/v0.1.2/Lumos-0.1.2-universal.tar.gz"
+  sha256 "04dcd574ae319c9166a0122c4126370125c495137477605e419393765b6cf561"
   license "MIT"
 
-  # `brew install --HEAD` builds straight off the default branch.
+  # `brew install --HEAD` builds straight off the default branch from source.
   head "https://github.com/Yoge5h9/Lumos.git", branch: "main"
 
-  # No `depends_on xcode`: `swift build` is green on a Command-Line-Tools-only
-  # machine, so requiring full Xcode (~15 GB) would be gratuitous. The light
-  # install is a core selling point.
   depends_on macos: :ventura # LSMinimumSystemVersion == 13.0 (Ventura)
 
   def install
-    system "swift", "build", "-c", "release", "--disable-sandbox"
+    if build.head?
+      # Source path (opt-in): compile + assemble the same bundle release.sh ships.
+      system "swift", "build", "-c", "release", "--disable-sandbox"
+      app_bundle = buildpath/"Lumos.app"
+      contents   = app_bundle/"Contents"
+      (contents/"MacOS").mkpath
+      (contents/"Resources").mkpath
+      cp buildpath/".build/release/lumos", contents/"MacOS/lumos"
+      cp buildpath/"Resources/Info.plist", contents/"Info.plist"
+      cp buildpath/"Resources/tips.json", contents/"Resources/tips.json"
+      cp buildpath/"Resources/AppIcon.icns", contents/"Resources/AppIcon.icns"
+      system "codesign", "-s", "-", "--force", "--deep", app_bundle
+    end
 
-    # Assemble the menu-bar .app the same way scripts/assemble-app.sh does, so
-    # the brew install and local development produce an identical bundle.
-    app_bundle = buildpath/"Lumos.app"
-    contents   = app_bundle/"Contents"
-    macos_dir  = contents/"MacOS"
-    resources  = contents/"Resources"
-    macos_dir.mkpath
-    resources.mkpath
-
-    cp buildpath/".build/release/lumos", macos_dir/"lumos"
-    cp buildpath/"Resources/Info.plist", contents/"Info.plist"
-    cp buildpath/"Resources/tips.json", resources/"tips.json"
-    cp buildpath/"Resources/AppIcon.icns", resources/"AppIcon.icns"
-
-    # Ad-hoc sign only (`-s -`) — deliberate: no Developer ID, no notarization.
-    # This is what keeps the formula Gatekeeper-free.
-    system "codesign", "-s", "-", "--force", "--deep", app_bundle
-
+    # Stable path: the release tarball already contains a signed, universal
+    # Lumos.app at its root — nothing to build.
     prefix.install "Lumos.app"
     bin.install_symlink prefix/"Lumos.app/Contents/MacOS/lumos" => "lumos"
   end
@@ -69,6 +67,5 @@ class Lumos < Formula
   test do
     assert_predicate prefix/"Lumos.app/Contents/MacOS/lumos", :exist?
     assert_predicate prefix/"Lumos.app/Contents/Info.plist", :exist?
-    assert_predicate prefix/"Lumos.app/Contents/Resources/AppIcon.icns", :exist?
   end
 end
