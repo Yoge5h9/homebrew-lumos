@@ -15,9 +15,9 @@
 class Lumos < Formula
   desc "Calm, ambient menu-bar glow for your Claude Code 5-hour usage window"
   homepage "https://github.com/Yoge5h9/Lumos"
-  version "0.1.2"
-  url "https://github.com/Yoge5h9/Lumos/releases/download/v0.1.2/Lumos-0.1.2-universal.tar.gz"
-  sha256 "04dcd574ae319c9166a0122c4126370125c495137477605e419393765b6cf561"
+  version "0.1.3"
+  url "https://github.com/Yoge5h9/Lumos/releases/download/v0.1.3/Lumos-0.1.3-universal.tar.gz"
+  sha256 "9c24a43cb1b6594b0d35c9315461082ac30b0587ed2e68524bd63c7f33735032"
   license "MIT"
 
   # `brew install --HEAD` builds straight off the default branch from source.
@@ -29,8 +29,8 @@ class Lumos < Formula
   # skips it. skip_relocation is valid because the binary is standalone (nothing
   # Cellar-relative to rewrite), so the pour needs no developer tools at all.
   bottle do
-    root_url "https://github.com/Yoge5h9/Lumos/releases/download/v0.1.2"
-    sha256 cellar: :any_skip_relocation, all: "3b155712dc9db51502c9315f3df2a718786220e6c2c49e9e313268283771cd86"
+    root_url "https://github.com/Yoge5h9/Lumos/releases/download/v0.1.3"
+    sha256 cellar: :any_skip_relocation, all: "6ef9cb4fcfb431ec01f26e25a809d7db4b60b8c8d51d1cbc17c9f58cc1f2c353"
   end
 
   depends_on macos: :ventura # LSMinimumSystemVersion == 13.0 (Ventura)
